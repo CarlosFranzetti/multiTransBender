@@ -58,6 +58,20 @@ juce::AudioProcessorValueTreeState::ParameterLayout MultiTransBenderProcessor::c
     layout.add (std::make_unique<AudioParameterBool> (
         ParameterID { "bypass", 1 }, "Bypass", false));
 
+    // prd.md 3.5. HQ LINEAR is offline-only — a linear-phase crossover is
+    // non-causal — so the real-time build offers the two causal modes.
+    //
+    // BALANCED is the default even though ZERO adds no latency, because the
+    // 64-sample lookahead is what lets the control signal be aligned with the
+    // peak it acts on. Without it, turning attack down makes a signal peakier
+    // rather than flatter: the detector's maximum divergence arrives after the
+    // onset, so an unaligned cut lands on the body of a hit and misses its peak.
+    // 1.3 ms of reported latency is a better default than a control that does
+    // not do what its label says.
+    layout.add (std::make_unique<AudioParameterChoice> (
+        ParameterID { "latencyMode", 1 }, "Latency Mode",
+        StringArray { "ZERO", "BALANCED" }, 1));
+
     for (int band = 0; band < mtb::maxBands; ++band)
     {
         const auto label = "Band " + juce::String (band + 1) + " ";
@@ -66,12 +80,27 @@ juce::AudioProcessorValueTreeState::ParameterLayout MultiTransBenderProcessor::c
             ParameterID { bandParamId (band, "device"), 1 }, label + "Device", deviceNames, 0));
         layout.add (std::make_unique<AudioParameterBool> (
             ParameterID { bandParamId (band, "enabled"), 1 }, label + "Enabled", true));
+        // Real units, matching prd.md 3.1 and the offline engine: +-15 dB attack,
+        // +-24 dB sustain. Automation lanes then read in dB rather than in an
+        // abstract 0-1 that means something different per band.
         layout.add (std::make_unique<AudioParameterFloat> (
             ParameterID { bandParamId (band, "attack"), 1 }, label + "Attack",
-            NormalisableRange<float> (-1.0f, 1.0f, 0.001f), 0.0f));
+            NormalisableRange<float> (-mtb::attackRangeDb, mtb::attackRangeDb, 0.01f), 0.0f));
         layout.add (std::make_unique<AudioParameterFloat> (
             ParameterID { bandParamId (band, "sustain"), 1 }, label + "Sustain",
-            NormalisableRange<float> (-1.0f, 1.0f, 0.001f), 0.0f));
+            NormalisableRange<float> (-mtb::sustainRangeDb, mtb::sustainRangeDb, 0.01f), 0.0f));
+        layout.add (std::make_unique<AudioParameterFloat> (
+            ParameterID { bandParamId (band, "detail"), 1 }, label + "Detail",
+            NormalisableRange<float> (0.0f, 1.0f, 0.001f), 0.0f));
+        layout.add (std::make_unique<AudioParameterFloat> (
+            ParameterID { bandParamId (band, "character"), 1 }, label + "Character",
+            NormalisableRange<float> (0.0f, 1.0f, 0.001f), 0.5f));
+        layout.add (std::make_unique<AudioParameterFloat> (
+            ParameterID { bandParamId (band, "satMix"), 1 }, label + "Sat Mix",
+            NormalisableRange<float> (0.0f, 1.0f, 0.001f), 0.7f));
+        layout.add (std::make_unique<AudioParameterFloat> (
+            ParameterID { bandParamId (band, "bandMix"), 1 }, label + "Band Mix",
+            NormalisableRange<float> (0.0f, 1.0f, 0.001f), 1.0f));
         layout.add (std::make_unique<AudioParameterFloat> (
             ParameterID { bandParamId (band, "attackTime"), 1 }, label + "Attack Time",
             NormalisableRange<float> (0.2f, 30.0f, 0.01f, 0.4f), band == 0 ? 6.0f : (band == 1 ? 2.5f : 1.2f)));
@@ -83,10 +112,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout MultiTransBenderProcessor::c
             NormalisableRange<float> (20.0f, 1200.0f, 1.0f, 0.5f), 200.0f));
         layout.add (std::make_unique<AudioParameterFloat> (
             ParameterID { bandParamId (band, "drive"), 1 }, label + "Drive",
-            NormalisableRange<float> (0.0f, 2.0f, 0.001f), 1.0f));
+            NormalisableRange<float> (0.0f, 1.0f, 0.001f), 0.4f));
         layout.add (std::make_unique<AudioParameterFloat> (
-            ParameterID { bandParamId (band, "trim"), 1 }, label + "Trim",
-            NormalisableRange<float> (-12.0f, 12.0f, 0.1f), 0.0f));
+            ParameterID { bandParamId (band, "trim"), 1 }, label + "Output",
+            NormalisableRange<float> (-mtb::outputRangeDb, mtb::outputRangeDb, 0.1f), 0.0f));
     }
 
     return layout;
@@ -103,14 +132,12 @@ void MultiTransBenderProcessor::prepareToPlay (double sampleRate, int maximumExp
 
     splitter.prepare (spec, mtb::maxBands);
 
-    bandStates.assign (mtb::maxBands, {});
     for (auto& state : bandStates)
     {
         state.prepare (sampleRate, static_cast<int> (spec.numChannels));
         state.setDetector (sampleRate, 25.0f);
     }
 
-    bandBuffers.assign (mtb::maxBands, juce::AudioBuffer<float>());
     for (auto& buffer : bandBuffers)
         buffer.setSize (static_cast<int> (spec.numChannels), maximumExpectedSamplesPerBlock);
 
@@ -118,9 +145,16 @@ void MultiTransBenderProcessor::prepareToPlay (double sampleRate, int maximumExp
     dryDelayed.setSize (static_cast<int> (spec.numChannels), maximumExpectedSamplesPerBlock);
 
     const auto maxDelay = static_cast<int> (sampleRate * 0.02) + 4;
+
+    // Every band needs its own delay line. They all delay by the same amount,
+    // but they carry different audio — sharing one line means each band's pushes
+    // displace the others' and every band reads back the wrong signal.
+    auto bandSpec = spec;
+    bandSpec.numChannels = static_cast<juce::uint32> (spec.numChannels * mtb::maxBands);
     lookaheadDelay.setMaximumDelayInSamples (maxDelay);
+    lookaheadDelay.prepare (bandSpec);
+
     dryDelay.setMaximumDelayInSamples (maxDelay);
-    lookaheadDelay.prepare (spec);
     dryDelay.prepare (spec);
 
     updateLatency();
@@ -145,17 +179,32 @@ bool MultiTransBenderProcessor::isBusesLayoutSupported (const BusesLayout& layou
 
 void MultiTransBenderProcessor::updateLatency()
 {
-    // The reported latency is the largest lookahead in use, since every band
-    // shares one delay line and they must stay time-aligned with each other.
-    float longest = 0.0f;
-    for (int band = 0; band < mtb::maxBands; ++band)
-    {
-        const auto index = static_cast<int> (
-            parameters.getRawParameterValue (bandParamId (band, "device"))->load());
-        longest = juce::jmax (longest, mtb::deviceAt (index).lookaheadMs);
-    }
+    // One delay line is shared by every band, so they stay time-aligned with
+    // each other and the host compensates once.
+    //
+    // The lookahead tracks the slowest band's attack time rather than sitting at
+    // a fixed 64 samples. A differential detector reaches full divergence about
+    // one attack time-constant after an onset, so the window has to be at least
+    // that long or the alignment cannot reach the peak it is meant to control —
+    // which is precisely the case where "attack down" stops working. tdd.md 3
+    // gives 64 samples as illustrative and asks for it to be tuned; this is that
+    // tuning, expressed as a rule instead of a constant.
+    const auto balanced = parameters.getRawParameterValue ("latencyMode")->load() > 0.5f;
 
-    const auto samples = static_cast<int> (std::round (longest * 0.001 * currentSampleRate));
+    float longestAttackMs = 0.0f;
+    for (int band = 0; band < mtb::maxBands; ++band)
+        longestAttackMs = juce::jmax (
+            longestAttackMs,
+            parameters.getRawParameterValue (bandParamId (band, "attackTime"))->load());
+
+    // Two time-constants: the fast envelope is still pulling away from the slow
+    // one at 1 tau, so a window of exactly tau clips the divergence before it
+    // peaks and the alignment lands short.
+    const auto lookaheadMs = juce::jlimit (1.0f, maxLookaheadMs, longestAttackMs * 2.0f);
+    const auto samples = balanced
+        ? static_cast<int> (std::round (lookaheadMs * 0.001 * currentSampleRate))
+        : 0;
+
     if (samples != reportedLatency)
     {
         reportedLatency = samples;
@@ -226,16 +275,25 @@ void MultiTransBenderProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
             parameters.getRawParameterValue (bandParamId (band, "device"))->load());
         const auto& device = mtb::deviceAt (deviceIndex);
 
-        const auto attack = parameters.getRawParameterValue (bandParamId (band, "attack"))->load();
-        const auto sustain = parameters.getRawParameterValue (bandParamId (band, "sustain"))->load();
+        const auto attackDb = parameters.getRawParameterValue (bandParamId (band, "attack"))->load();
+        const auto sustainDb = parameters.getRawParameterValue (bandParamId (band, "sustain"))->load();
         const auto attackTime = parameters.getRawParameterValue (bandParamId (band, "attackTime"))->load();
         const auto release = parameters.getRawParameterValue (bandParamId (band, "release"))->load();
         const auto sustainTime = parameters.getRawParameterValue (bandParamId (band, "sustainTime"))->load();
         const auto drive = parameters.getRawParameterValue (bandParamId (band, "drive"))->load();
+        const auto character = parameters.getRawParameterValue (bandParamId (band, "character"))->load();
+        const auto satMix = parameters.getRawParameterValue (bandParamId (band, "satMix"))->load();
+        const auto bandMix = parameters.getRawParameterValue (bandParamId (band, "bandMix"))->load();
         const auto trim = mtb::dbToGain (parameters.getRawParameterValue (bandParamId (band, "trim"))->load());
 
         state.setTimes (attackTime, release, sustainTime);
-        state.setDetector (currentSampleRate, device.detectorHpfHz);
+        state.setDetector (currentSampleRate, 25.0f);
+
+        // Align the control signal with the peak it acts on. The window matches
+        // the audio delay, so the shaping is in place by the time the peak
+        // reaches the output. Direction follows the sign of the attack control:
+        // a boost wants the maximum over the window, a cut wants the minimum.
+        state.setAlignment (juce::jmax (1, reportedLatency), attackDb >= 0.0f);
 
         auto* const* readPointers = bandBuffer.getArrayOfReadPointers();
         auto* const* writePointers = bandBuffer.getArrayOfWritePointers();
@@ -244,10 +302,8 @@ void MultiTransBenderProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
 
         for (int i = 0; i < numSamples; ++i)
         {
-            const auto detector = state.detect (readPointers, numChannels, i, device.detector);
-            const auto gainDb = (attack != 0.0f || sustain != 0.0f)
-                                    ? state.computeGainDb (detector, attack, sustain, device)
-                                    : 0.0f;
+            const auto detector = state.detect (readPointers, numChannels, i);
+            const auto gainDb = state.computeGainDb (detector, attackDb, sustainDb);
             if (std::abs (gainDb) > std::abs (peakGain))
                 peakGain = gainDb;
 
@@ -256,11 +312,16 @@ void MultiTransBenderProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
             for (int c = 0; c < numChannels; ++c)
             {
                 // Delay the audio so the control signal, derived from the
-                // undelayed stream, lands slightly ahead of the transient.
-                lookaheadDelay.pushSample (c, writePointers[c][i]);
-                auto x = lookaheadDelay.popSample (c, lookaheadSamples, true);
-                x = state.saturate (x * gain, c, device, drive) * trim;
-                writePointers[c][i] = x;
+                // undelayed stream, is already in place when the peak arrives.
+                const auto line = band * numChannels + c;
+                lookaheadDelay.pushSample (line, writePointers[c][i]);
+                const auto delayed = lookaheadDelay.popSample (line, lookaheadSamples, true);
+
+                const auto shaped = delayed * gain;
+                const auto saturated =
+                    state.saturate (shaped, c, device, drive, character) * satMix
+                    + shaped * (1.0f - satMix);
+                writePointers[c][i] = (saturated * trim) * bandMix + delayed * (1.0f - bandMix);
             }
         }
 

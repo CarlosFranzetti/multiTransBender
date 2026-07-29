@@ -2,7 +2,7 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_dsp/juce_dsp.h>
-#include <vector>
+#include <array>
 
 #include "Devices.h"
 #include "ProjectStore.h"
@@ -28,6 +28,9 @@ public:
     void releaseResources() override;
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
     void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
+    // Keeps the double-precision overload visible rather than hidden by the
+    // float one, which -Woverloaded-virtual correctly flags.
+    using juce::AudioProcessor::processBlock;
 
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override { return true; }
@@ -65,8 +68,8 @@ private:
     juce::AudioProcessorValueTreeState parameters;
 
     mtb::LinkwitzRileySplitter splitter;
-    std::vector<mtb::BandState> bandStates;
-    std::vector<juce::AudioBuffer<float>> bandBuffers;
+    std::array<mtb::BandState, mtb::maxBands> bandStates;
+    std::array<juce::AudioBuffer<float>, mtb::maxBands> bandBuffers;
     juce::AudioBuffer<float> summed;
     juce::AudioBuffer<float> dryDelayed;
 
@@ -79,6 +82,8 @@ private:
     juce::dsp::DelayLine<float, juce::dsp::DelayLineInterpolationTypes::None> dryDelay { 8192 };
 
     std::array<std::atomic<float>, mtb::maxBands> bandGainDb {};
+    /** Ceiling on BALANCED-mode lookahead, in ms. Keeps reported PDC bounded. */
+    static constexpr float maxLookaheadMs = 12.0f;
     int reportedLatency = 0;
     double currentSampleRate = 44100.0;
 

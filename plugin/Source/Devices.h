@@ -4,95 +4,119 @@
 #include <string_view>
 
 /**
- * Device voicings, kept numerically identical to src/dsp/devices.ts.
+ * The ten TRANSBAND saturation engines.
  *
- * The two implementations are separate code because one has to run in a
- * real-time callback and the other does not, but the numbers here are the
- * contract between them: a chain rendered in the browser and the same chain
- * rendered by the plugin must sound the same. Any change to one table has to be
- * made to the other, and tests/dsp.test.ts is the arbiter of what correct
- * sounds like.
+ * Numerically identical to src/dsp/devices.ts. That table is the contract
+ * between the offline renderer and this real-time engine: a chain dialled in the
+ * browser and the same chain in the plugin must sound the same, so changing one
+ * table without the other silently breaks the product's central claim.
+ *
+ * Original names and original artwork throughout (prd.md §9). These are
+ * character models built from published circuit topology and listening, not
+ * measurements of hardware — `calibration` is the hook for fitting a real unit
+ * later without disturbing the topology (tdd.md §5.2).
  */
 namespace mtb
 {
 
-enum class DetectorMode { peak, rms, hybrid };
-enum class EnvelopeLaw { linear, exponential, program };
-enum class Saturation { none, tube, tape, transformer, vca, diode };
+/** The nonlinear core an engine is built on. Mirrors SaturationCore in TypeScript. */
+enum class Core
+{
+    valveTwin,     // triode/pentode pair, bias-shifting
+    tapeTranny,    // tape softening plus transformer iron
+    pentodeTriode, // parallel pentode and triode paths
+    programTube,   // programme EQ into a single tube stage
+    tapeSilk,      // tape emulation with a silk shelf
+    tubeTransformer,
+    warmLpf,
+    evenHarmonic,
+    bandDrive,
+    fetDiode,
+};
 
 struct DeviceModel
 {
     std::string_view id;
     std::string_view name;
-    std::string_view blurb;
-    DetectorMode detector;
-    EnvelopeLaw envelopeLaw;
-    float attackScaleDb;
-    float sustainScaleDb;
-    float kneeDb;
-    float detectorHpfHz;
-    float detectorTiltDb;
-    Saturation saturation;
-    float saturationDrive;
-    float saturationBias;
-    int oversample;
+    std::string_view sub;
+    Core core;
+    /** What CHARACTER controls on this engine. */
+    std::string_view characterLabel;
+    /** Drive multiplier at DRIVE = 1. */
+    float driveDepth;
+    /** Static asymmetry before CHARACTER modulates it. */
+    float bias;
+    /** Corner of the engine's own voicing filter, Hz. */
+    float toneHz;
+    /** Output trim baked into the voicing, dB. */
     float outputTrimDb;
-    float lookaheadMs;
+    /** Harmonic calibration weights: 2nd, 3rd, 4th, 5th. */
+    std::array<float, 4> calibration;
 };
 
-inline constexpr std::array<DeviceModel, 6> devices { {
-    { "vitrine", "Vitrine",
-      "Glass-clear reference. Pure envelope shaping, no colour, nothing added.",
-      DetectorMode::hybrid, EnvelopeLaw::linear,
-      14.0f, 12.0f, 3.0f, 25.0f, 0.0f,
-      Saturation::none, 0.0f, 0.0f, 1, 0.0f, 1.5f },
+inline constexpr std::array<DeviceModel, 10> devices { {
+    { "vulture", "VULTURE", "TWIN VALVE DISTORTION", Core::valveTwin,
+      "Triode to pentode bias", 14.0f, 0.35f, 8000.0f, -1.4f, { 1.0f, 0.85f, 0.5f, 0.42f } },
 
-    { "aureus", "Aureus",
-      "Class-A gold. Soft knee, second-harmonic bloom, forgiving on vocals.",
-      DetectorMode::rms, EnvelopeLaw::exponential,
-      11.0f, 13.0f, 6.0f, 35.0f, 1.5f,
-      Saturation::tube, 0.35f, 0.4f, 4, -0.4f, 2.5f },
+    { "fatso", "PHATSO 7x", "TAPE SIM / OPTIMIZER", Core::tapeTranny,
+      "Tape to transformer", 9.0f, 0.12f, 12000.0f, -0.9f, { 0.8f, 1.0f, 0.35f, 0.3f } },
 
-    { "ferrite", "Ferrite",
-      "Iron and oxide. Slow envelope law, compressed peaks, weighty low end.",
-      DetectorMode::rms, EnvelopeLaw::program,
-      10.0f, 15.0f, 8.0f, 20.0f, -2.0f,
-      Saturation::tape, 0.45f, 0.0f, 4, -0.8f, 3.0f },
+    { "hg2", "HG-II", "PENTODE + TRIODE SAT", Core::pentodeTriode,
+      "Pentode to triode blend", 11.0f, 0.2f, 14000.0f, -1.1f, { 1.0f, 0.7f, 0.55f, 0.35f } },
 
-    { "obsidian", "Obsidian",
-      "Hard, fast, unsentimental. Built for drums that need to cut.",
-      DetectorMode::peak, EnvelopeLaw::linear,
-      16.0f, 10.0f, 1.0f, 60.0f, 3.0f,
-      Saturation::vca, 0.3f, -0.2f, 8, -0.6f, 0.8f },
+    { "vitalizer", "REVITALIZER", "PROGRAM EQ - TUBE", Core::programTube,
+      "Mid-high tune", 7.0f, 0.28f, 3800.0f, -0.7f, { 1.0f, 0.45f, 0.3f, 0.2f } },
 
-    { "halcyon", "Halcyon",
-      "Programme-dependent and unhurried. Sustain work that never pumps.",
-      DetectorMode::rms, EnvelopeLaw::program,
-      9.0f, 16.0f, 10.0f, 30.0f, 0.0f,
-      Saturation::tube, 0.18f, 0.25f, 2, -0.2f, 4.0f },
+    { "portico", "P-542", "TAPE EMULATION - SILK", Core::tapeSilk,
+      "Silk blue to red", 8.0f, 0.15f, 9000.0f, -0.8f, { 0.9f, 0.6f, 0.4f, 0.25f } },
 
-    { "prism", "Prism",
-      "The multi-band specialist. Wide bands, minimal colour, surgical splits.",
-      DetectorMode::hybrid, EnvelopeLaw::exponential,
-      13.0f, 13.0f, 4.0f, 25.0f, 1.0f,
-      Saturation::transformer, 0.22f, 0.0f, 4, -0.3f, 2.0f },
+    { "glats1", "WIZARD TS-1", "STEREO TUBE SATURATOR", Core::tubeTransformer,
+      "Transformer drive", 12.0f, 0.3f, 220.0f, -1.2f, { 1.0f, 0.75f, 0.45f, 0.4f } },
+
+    { "boum", "BOM", "ANALOG WARMING", Core::warmLpf,
+      "Analogue lowpass", 10.0f, -0.18f, 7000.0f, -0.6f, { 0.6f, 1.0f, 0.3f, 0.45f } },
+
+    { "sa2rate", "SA2RATE", "EVEN-HARMONIC SAT", Core::evenHarmonic,
+      "Even to odd symmetry", 13.0f, 0.5f, 16000.0f, -1.0f, { 1.0f, 0.3f, 0.6f, 0.2f } },
+
+    { "carnaby", "CARNABY", "HARMONIC EQ", Core::bandDrive,
+      "Drive tilt, LF to HF", 9.0f, 0.1f, 1000.0f, -0.7f, { 0.85f, 0.8f, 0.4f, 0.3f } },
+
+    { "overstayer", "M-A-S", "HARMONICS / DENSITY", Core::fetDiode,
+      "FET to diode", 12.0f, -0.3f, 60.0f, -1.0f, { 0.7f, 1.0f, 0.35f, 0.55f } },
 } };
 
 inline constexpr int numDevices = static_cast<int> (devices.size());
 
 inline const DeviceModel& deviceAt (int index) noexcept
 {
-    return devices[static_cast<size_t> (index < 0 ? 0 : (index >= numDevices ? numDevices - 1 : index))];
+    const auto clamped = index < 0 ? 0 : (index >= numDevices ? numDevices - 1 : index);
+    return devices[static_cast<size_t> (clamped)];
 }
 
-/** Divergence in dB that counts as a fully-formed transient. Mirrors the engine. */
+/** Divergence in dB that counts as a fully-formed transient. */
 inline constexpr float referenceDb = 18.0f;
 
-/** Slow-envelope ratios. See src/dsp/envelope.ts for why the release ratio exists. */
+/** Soft-knee width on the differential rectifier. */
+inline constexpr float kneeDb = 4.0f;
+
+/**
+ * Slow-envelope ratios.
+ *
+ * The release ratio is a correctness requirement, not a voicing choice: two
+ * one-pole followers sharing a release coefficient decay at the same rate, so
+ * once an onset pushes them apart the difference never returns to zero and the
+ * detector degenerates into a fixed gain. See src/dsp/envelope.ts.
+ */
 inline constexpr float slowAttackRatio = 20.0f;
 inline constexpr float attackSlowReleaseRatio = 4.0f;
 inline constexpr float sustainSlowReleaseRatio = 8.0f;
 
-inline constexpr int maxBands = 4;
+/** prd.md §3.1 control ranges. */
+inline constexpr float attackRangeDb = 15.0f;
+inline constexpr float sustainRangeDb = 24.0f;
+inline constexpr float outputRangeDb = 12.0f;
+
+inline constexpr int maxBands = 6;
 
 } // namespace mtb

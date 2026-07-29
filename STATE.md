@@ -21,6 +21,10 @@ correctness requirement, not a voicing choice.
 
 **Test that caught it:** crest factor must rise when attack rises.
 
+The same class of bug then appeared *independently* in the C++ engine, which is
+the argument for the plugin having its own test suite rather than trusting the
+TypeScript one.
+
 ### 1.2 Attack-down made signals peakier
 
 A differential detector reaches maximum divergence roughly one attack
@@ -72,10 +76,12 @@ required measuring peak and RMS separately rather than trusting the ratio.
 
 ## 3. Known gaps
 
-1. **The JUCE plugin has not been compiled.** The project, DSP headers, processor,
-   editor and backup store are written against the same numbers as the web
-   engine, but no compiler has seen them. Phase 0 exit criteria (loads in Live,
-   passes pluginval) are unmet. This is the single biggest honesty gap.
+1. **The plugin compiles and self-tests, but has not been loaded in a DAW.**
+   VST3 and Standalone build clean on Linux and all 17 compiled-plugin checks
+   pass. macOS (VST3/AU/Standalone universal) and Windows (VST3/Standalone) are
+   produced by `.github/workflows/build-plugin.yml`; those binaries have not
+   been opened in Live, Logic or any host, and pluginval has not been run.
+   Phase 0's "loads in Live, passes pluginval level 5" is still unmet.
 2. **Faceplate switches are cosmetic.** The two toggles per device have no DSP
    behaviour yet because the PRD does not define one. They are deliberately not
    pretending to be wired.
@@ -91,6 +97,38 @@ required measuring peak and RMS separately rather than trusting the ratio.
    binding in the new TRANSBAND shell.
 
 ---
+
+## 3a. The RACK 3D look is settled — keep it
+
+The current RACK 3D treatment is the reference. Do not redesign it; extend it.
+
+What makes it read as hardware:
+- **Pseudo-3D, not a GL scene.** A single CSS `perspective(950px) rotateX(58deg)`
+  on the top plate, per tdd.md §6.1. Cheap, fully interactive, no renderer.
+- **The top plate carries real furniture**: punched vent slots as a repeating
+  gradient, a transformer block with its own laminate striping, and glowing
+  valves whose count comes from the device definition.
+- **Valves glow with two shadows**, a tight warm core and a wide soft halo. One
+  shadow looks flat; two reads as emission.
+- **Rack ears with screws** on both sides, each screw a radial gradient with an
+  offset slot — the detail that sells scale.
+- **A serial number** along the plate's lower edge in mono type.
+- **Faceplates stay theme-independent.** Chrome changes with the theme; hardware
+  does not, because an object that changes colour with the app stops being an
+  object.
+
+Future devices get their look from data (face, ink, accent, texture, knob
+variant, meter type, valve count), so a new panel is a table entry, not new
+drawing code. That is the data-driven skin plan from tdd.md §6.1 and it should
+stay that way.
+
+## 3b. Chrome accent is blue, not gold
+
+The mockup's gold accent sat in the same hue family as several faceplates
+(VULTURE's cream, SA²RATE's sand, M·A·S's amber), so selected chrome competed
+with the hardware it framed. Azure separates app from device at a glance and
+stays legible against every faceplate. Four chrome themes ship: Studio Dark
+(default), Studio Light, Midnight, Graphite.
 
 ## 4. Ideas parked for later
 
@@ -124,6 +162,26 @@ required measuring peak and RMS separately rather than trusting the ratio.
 
 ---
 
+### 1.4 The plugin shared one delay line across all bands
+
+Every band pushed into the same `juce::dsp::DelayLine`, so with three bands each
+sample was pushed three times and every band read back a mixture of its
+neighbours. Crest factor on attack-down moved the wrong way by 2.4 dB. Fixed by
+prepping the line with `numChannels * maxBands` channels and indexing
+`band * numChannels + c`.
+
+### 1.5 Real-time peak alignment is bounded by causality
+
+The offline engine reads its gain curve arbitrarily far ahead at no cost. A
+plugin can only look ahead as far as it is willing to delay, so the same
+alignment gives a much smaller crest reduction on attack-down — correct
+direction, modest magnitude. BALANCED mode therefore sets lookahead from twice
+the slowest band's attack time (capped at 12 ms) rather than the fixed 64
+samples tdd.md §3 offered as illustrative. Widening past 12 ms measured no
+further improvement, so 12 ms is the cap. ZERO mode has no lookahead and
+therefore cannot align at all; that is inherent, and it is why BALANCED is the
+default.
+
 ## 5. Verification status
 
 `npm test` — 68/68 checks passing. Covers: FFT/convolution, FIR invariants,
@@ -135,3 +193,12 @@ solo, A/B loudness matching, and timeline blending.
 End-to-end browser check (Playwright): 24-bit 48 kHz stereo source → render →
 32-bit float download, with sample rate, frame count and channel count preserved
 and integrated loudness matched to 0.01 LU.
+
+`plugin/tests/EngineSmokeTest.cpp` — 17/17 checks passing against the *compiled*
+plugin on Linux. Drives the real `AudioProcessor` in host-sized blocks: neutral
+transparency, attack up and down, all ten engines rendering finite audio at a
+sane level, and state save/recall. CI runs it on macOS and Windows too, and a
+red run blocks the download bundle.
+
+Not yet verified: loading in a DAW, pluginval, auval, and the sample-rate and
+buffer-size matrix from prd.md §5.

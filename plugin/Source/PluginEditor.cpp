@@ -20,8 +20,8 @@ juce::Colour deviceColour (int index)
 
 // ---------------------------------------------------------------------------
 
-BandStrip::BandStrip (MultiTransBenderProcessor& processor, int bandIndex)
-    : proc (processor), index (bandIndex)
+BandStrip::BandStrip (MultiTransBenderProcessor& owner, int bandIndex)
+    : proc (owner), index (bandIndex)
 {
     auto& state = proc.getState();
 
@@ -150,8 +150,8 @@ void BandStrip::resized()
 
 // ---------------------------------------------------------------------------
 
-MultiTransBenderEditor::MultiTransBenderEditor (MultiTransBenderProcessor& processor)
-    : AudioProcessorEditor (&processor), proc (processor)
+MultiTransBenderEditor::MultiTransBenderEditor (MultiTransBenderProcessor& owner)
+    : AudioProcessorEditor (&owner), proc (owner)
 {
     auto& state = proc.getState();
 

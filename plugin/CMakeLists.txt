@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(multiTransBender VERSION 1.0.0 LANGUAGES CXX)
+# JUCE compiles C sources of its own (and on Apple platforms, Objective-C++),
+# so those languages have to be enabled here even though none of our code uses
+# them. Declaring CXX alone fails at generate time with a missing
+# CMAKE_C_COMPILE_OBJECT.
+project(multiTransBender VERSION 0.1.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -60,4 +64,24 @@ target_link_libraries(multiTransBender PRIVATE
     juce::juce_recommended_config_flags
     juce::juce_recommended_lto_flags
     juce::juce_recommended_warning_flags
+)
+
+# ---------------------------------------------------------------------------
+# Console smoke test for the compiled plugin. Links the shared code and drives
+# the real AudioProcessor, so it verifies the binary that actually ships rather
+# than a reimplementation of it.
+juce_add_console_app(multiTransBenderTests PRODUCT_NAME "multiTransBenderTests")
+
+target_sources(multiTransBenderTests PRIVATE tests/EngineSmokeTest.cpp)
+target_include_directories(multiTransBenderTests PRIVATE Source)
+target_compile_definitions(multiTransBenderTests PRIVATE
+    JUCE_WEB_BROWSER=0
+    JUCE_USE_CURL=0
+    JUCE_STANDALONE_APPLICATION=1
+    JUCE_DISPLAY_SPLASH_SCREEN=0
+)
+target_link_libraries(multiTransBenderTests PRIVATE
+    multiTransBender
+    juce::juce_audio_utils
+    juce::juce_dsp
 )

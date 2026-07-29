@@ -10,7 +10,7 @@
 class BandStrip final : public juce::Component
 {
 public:
-    BandStrip (MultiTransBenderProcessor& processor, int bandIndex);
+    BandStrip (MultiTransBenderProcessor& owner, int bandIndex);
 
     void paint (juce::Graphics&) override;
     void resized() override;
@@ -46,7 +46,7 @@ class MultiTransBenderEditor final : public juce::AudioProcessorEditor,
                                      private juce::Timer
 {
 public:
-    explicit MultiTransBenderEditor (MultiTransBenderProcessor&);
+    explicit MultiTransBenderEditor (MultiTransBenderProcessor& owner);
     ~MultiTransBenderEditor() override = default;
 
     void paint (juce::Graphics&) override;
