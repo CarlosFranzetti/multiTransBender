@@ -139,7 +139,7 @@ export function Spectrum({
         borderRadius: 10,
         overflow: 'hidden',
         boxShadow:
-          theme.id === 'dark'
+          theme.dark
             ? 'inset 0 2px 10px rgba(0,0,0,.7)'
             : 'inset 0 2px 8px rgba(0,0,0,.15), 0 1px 0 rgba(255,255,255,.6)',
       }}
