@@ -49,9 +49,15 @@ export default function PluginPage() {
         <div className="btn-row">
           <a
             className="btn btn-primary"
-            href="https://github.com/CarlosFranzetti/multiTransBender/releases/latest"
+            href="https://github.com/CarlosFranzetti/multiTransBender/releases/download/latest-beta/multiTransBender-plugins.zip"
           >
             Download compiled plugins
+          </a>
+          <a
+            className="btn"
+            href="https://github.com/CarlosFranzetti/multiTransBender/releases"
+          >
+            All releases
           </a>
           <a
             className="btn"
