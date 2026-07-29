@@ -2,14 +2,20 @@
 
 **v0.1b beta** · A multiband transient designer with per-band analog saturation.
 
-Split the spectrum into up to **six bands**. Give every band its own attack,
-sustain and detail shaping **and** its own saturation engine, chosen from **ten**
-original analog-flavoured models. Three interchangeable views of one parameter
-state.
+multiTransBender
 
-Built to the specification in [`design/transband/`](design/transband/) — see
-`prd.md` (product), `tdd.md` (technical), `plan.md` (phased build), and
-`gui/transband-v5.jsx` (the canonical visual spec).
+Multiband transient designer with per-band analog-flavored saturation, delivered as VST3/AU/CLAP plugins plus a standalone app.
+
+RackForge is now past the pure planning stage. The repository contains a JUCE/CMake scaffold with a neutral passthrough processor, a fixed six-band APVTS parameter layout, a locally closed Phase 1 GUI-framework milestone, and the first Phase 2 DSP graph boundary. The React files in gui/ remain the visual and interaction spec for the production JUCE GUI.
+
+Current State
+
+CMakeLists.txt fetches JUCE 8 and clap-juce-extensions.
+Source/ contains the Phase 0 processor/editor scaffold, the Phase 1 ViewHost/GUI/skin-rendering components, and the first neutral Phase 2 DSP graph class.
+Resources/skins/rackforge-skin-schema.json defines the first JSON skin schema stub.
+The processor supports float and double processing and currently passes audio through unchanged.
+The APVTS layout already reserves the global preferences, five crossover parameters, and six complete band parameter sets.
+gui/rackforge-v4-all-views.jsx is the canonical GUI reference.
 
 ---
 
