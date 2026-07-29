@@ -10,9 +10,13 @@ juce::String timestamp()
 
 ProjectStore::ProjectStore()
 {
+    // Grouped under the company so future Case Audio products sit alongside
+    // rather than scattering folders across the application data directory.
     root = juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory)
+               .getChildFile ("Case Audio")
                .getChildFile ("MultiTransBend");
 
+    root.createDirectory();
     getBackupDirectory().createDirectory();
     getExportDirectory().createDirectory();
 }

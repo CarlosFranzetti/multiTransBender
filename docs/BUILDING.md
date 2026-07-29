@@ -50,9 +50,9 @@ installed to the system plugin folder as part of the build.
 
 | Platform | Path |
 | --- | --- |
-| macOS | `~/Library/Application Support/MultiTransBend/` |
-| Windows | `%APPDATA%\MultiTransBend\` |
-| Linux | `~/.config/MultiTransBend/` |
+| macOS | `~/Library/Application Support/Case Audio/MultiTransBend/` |
+| Windows | `%APPDATA%\Case Audio\MultiTransBend\` |
+| Linux | `~/.config/Case Audio/MultiTransBend/` |
 
 Inside that folder, `backups/` holds the last three processing states and
 `exports/` holds a dated copy of every render together with the settings that

@@ -1,6 +1,8 @@
 # MultiTransBend
 
-**v0.1b beta** · A multiband transient designer with per-band analog saturation.
+**by Case Audio** · v0.1b beta
+
+A multiband transient designer with per-band analog saturation.
 
 Split the spectrum into up to **six bands**. Give every band its own attack,
 sustain and detail shaping **and** its own saturation engine, chosen from **ten**
@@ -211,6 +213,10 @@ labels claim. That last one caught two real bugs; both are documented in
 [STATE.md](STATE.md).
 
 ---
+
+## Company
+
+**Case Audio** — original DSP, original panel artwork, original names.
 
 ## Credits
 

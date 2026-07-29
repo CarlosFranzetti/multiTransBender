@@ -159,15 +159,15 @@ cmake --build build --config Release --parallel`}
           <tbody>
             <tr>
               <td>macOS</td>
-              <td>~/Library/Application Support/MultiTransBend/</td>
+              <td>~/Library/Application Support/Case Audio/MultiTransBend/</td>
             </tr>
             <tr>
               <td>Windows</td>
-              <td>%APPDATA%\MultiTransBend\</td>
+              <td>%APPDATA%\Case Audio\MultiTransBend\</td>
             </tr>
             <tr>
               <td>Linux</td>
-              <td>~/.config/MultiTransBend/</td>
+              <td>~/.config/Case Audio/MultiTransBend/</td>
             </tr>
           </tbody>
         </table>

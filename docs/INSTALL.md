@@ -1,5 +1,7 @@
 # Installing MultiTransBend
 
+**by Case Audio** · v0.1b beta
+
 The download contains one folder per platform. Take the one for your machine.
 
 | Platform | Formats |
@@ -50,6 +52,18 @@ are satisfied with where the file came from.
 VST3         → ~/.vst3/
 Standalone   → anywhere
 ```
+
+## Where it keeps your work
+
+| Platform | Path |
+| --- | --- |
+| macOS | `~/Library/Application Support/Case Audio/MultiTransBend/` |
+| Windows | `%APPDATA%\Case Audio\MultiTransBend\` |
+| Linux | `~/.config/Case Audio/MultiTransBend/` |
+
+`backups/` holds the last three processing states, restorable from the editor.
+`exports/` holds a dated copy of every render alongside the settings that
+produced it. Nothing in either folder is ever transmitted.
 
 ## Verifying the build
 

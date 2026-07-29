@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   description:
     'A multiband transient designer with per-band analog saturation. Six bands, ten engines, three views. Process in the browser at full resolution and download a lossless file. Nothing is uploaded.',
   applicationName: 'MultiTransBend',
+  authors: [{ name: 'Case Audio' }],
+  creator: 'Case Audio',
+  publisher: 'Case Audio',
 };
 
 export const viewport: Viewport = {

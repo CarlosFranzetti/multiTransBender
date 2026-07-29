@@ -7,6 +7,8 @@ const juce::Colour surface { 0xff14171b };
 const juce::Colour line { 0x14ffffff };
 const juce::Colour textColour { 0xffe9ebee };
 const juce::Colour dimText { 0xff9aa1aa };
+// Azure accent, matching the web app's chrome.
+const juce::Colour accentColour { 0xff4da3ff };
 
 juce::Colour deviceColour (int index)
 {
@@ -67,7 +69,7 @@ void BandStrip::addRotary (juce::Slider& slider, juce::Label& label, const juce:
 {
     slider.setSliderStyle (juce::Slider::RotaryHorizontalVerticalDrag);
     slider.setTextBoxStyle (juce::Slider::TextBoxBelow, false, 62, 15);
-    slider.setColour (juce::Slider::rotarySliderFillColourId, deviceColour (0));
+    slider.setColour (juce::Slider::rotarySliderFillColourId, accentColour);
     slider.setColour (juce::Slider::textBoxTextColourId, textColour);
     slider.setColour (juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
     slider.setColour (juce::Slider::textBoxBackgroundColourId, juce::Colours::transparentBlack);
@@ -170,7 +172,7 @@ MultiTransBendEditor::MultiTransBendEditor (MultiTransBendProcessor& owner)
     {
         entry.slider.setSliderStyle (juce::Slider::RotaryHorizontalVerticalDrag);
         entry.slider.setTextBoxStyle (juce::Slider::TextBoxBelow, false, 64, 15);
-        entry.slider.setColour (juce::Slider::rotarySliderFillColourId, deviceColour (0));
+        entry.slider.setColour (juce::Slider::rotarySliderFillColourId, accentColour);
         entry.slider.setColour (juce::Slider::textBoxTextColourId, textColour);
         entry.slider.setColour (juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
         addAndMakeVisible (entry.slider);
@@ -250,9 +252,16 @@ void MultiTransBendEditor::paint (juce::Graphics& g)
 {
     g.fillAll (background);
 
+    // Product first, maker second — the same hierarchy the web app uses.
     g.setColour (textColour);
     g.setFont (juce::FontOptions (19.0f).withStyle ("Bold"));
-    g.drawText ("MultiTransBend", 18, 14, 300, 24, juce::Justification::centredLeft);
+    g.drawText ("MULTI", 18, 14, 60, 24, juce::Justification::centredLeft);
+    g.setColour (accentColour);
+    g.drawText ("TRANSBEND", 74, 14, 240, 24, juce::Justification::centredLeft);
+
+    g.setColour (dimText);
+    g.setFont (juce::FontOptions (10.0f));
+    g.drawText ("CASE AUDIO", getWidth() - 130, 16, 112, 20, juce::Justification::centredRight);
 
     g.setColour (dimText);
     g.setFont (juce::FontOptions (11.0f));
