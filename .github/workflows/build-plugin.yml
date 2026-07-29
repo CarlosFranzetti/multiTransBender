@@ -78,24 +78,27 @@ jobs:
 
       - name: Collect artefacts
         shell: bash
+        # Staged in its own directory rather than dist/, which already exists in
+        # the repository and holds the source archives — collecting into it swept
+        # those into the plugin download.
         run: |
-          mkdir -p dist
+          rm -rf staged && mkdir -p staged
           SRC="plugin/build/multiTransBender_artefacts/Release"
           [ -d "$SRC" ] || SRC="plugin/build/multiTransBender_artefacts"
           for fmt in VST3 AU Standalone; do
             if [ -d "$SRC/$fmt" ]; then
-              mkdir -p "dist/$fmt"
-              cp -R "$SRC/$fmt/." "dist/$fmt/"
+              mkdir -p "staged/$fmt"
+              cp -R "$SRC/$fmt/." "staged/$fmt/"
             fi
           done
-          cp LICENSE dist/ 2>/dev/null || true
-          cp docs/INSTALL.md dist/ 2>/dev/null || true
-          ls -laR dist
+          cp LICENSE staged/
+          cp docs/INSTALL.md staged/
+          ls -laR staged
 
       - uses: actions/upload-artifact@v4
         with:
           name: multiTransBender-${{ matrix.artifact }}
-          path: dist
+          path: staged
           if-no-files-found: error
 
   package:
