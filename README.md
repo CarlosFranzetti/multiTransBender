@@ -2,7 +2,15 @@
 
 **by Case Audio** · v0.1b beta
 
-A multiband transient designer with per-band analog saturation.
+### ▶ [Open the web app](https://multi-trans-bend.vercel.app/)
+
+A multiband transient designer with per-band analog saturation. The web version
+runs entirely in your browser — drop a file in, work, download a lossless
+result. Nothing is uploaded.
+
+[Web app](https://multi-trans-bend.vercel.app/) ·
+[Download the plugins](https://github.com/CarlosFranzetti/MultiTransBend/releases/download/latest-beta/MultiTransBend-plugins.zip) ·
+[Build from source](docs/BUILDING.md)
 
 Split the spectrum into up to **six bands**. Give every band its own attack,
 sustain and detail shaping **and** its own saturation engine, chosen from **ten**

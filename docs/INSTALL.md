@@ -2,6 +2,9 @@
 
 **by Case Audio** · v0.1b beta
 
+No installation needed to try it: the web version runs in a browser at
+<https://multi-trans-bend.vercel.app/>. The plugins below are for working inside a DAW.
+
 The download contains one folder per platform. Take the one for your machine.
 
 | Platform | Formats |

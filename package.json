@@ -2,7 +2,17 @@
   "name": "multitransbend",
   "version": "0.1.0-beta.1",
   "private": true,
-  "description": "CASE AUDIO \u2014 MultiTransBend: multiband transient designer with per-band analog saturation.",
+  "description": "MultiTransBend by Case Audio — a multiband transient designer with per-band analog saturation.",
+  "homepage": "https://multi-trans-bend.vercel.app/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CarlosFranzetti/MultiTransBend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/CarlosFranzetti/MultiTransBend/issues"
+  },
+  "author": "Case Audio",
+  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

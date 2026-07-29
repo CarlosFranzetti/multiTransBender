@@ -182,6 +182,15 @@ further improvement, so 12 ms is the cap. ZERO mode has no lookahead and
 therefore cannot align at all; that is inherent, and it is why BALANCED is the
 default.
 
+## 4a. Live deployment
+
+Web app: <https://multi-trans-bend.vercel.app/>, deployed from this repository
+on Vercel. The domain comes from Vercel splitting the camel case in the project
+name `MultiTransBend`; renaming the project would change the URL, so it stays.
+
+Plugins: `latest-beta` release, refreshed by CI on every push to the development
+branch.
+
 ## 5. Verification status
 
 `npm test` — 68/68 checks passing. Covers: FFT/convolution, FIR invariants,
