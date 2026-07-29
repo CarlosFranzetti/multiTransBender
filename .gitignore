@@ -1,0 +1,33 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# next
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# build output
+build/
+plugin/build/
+
+# vercel
+.vercel
+
+# environment
+.env
+.env*.local
+
+# os
+.DS_Store
+Thumbs.db
+
+# editor
+.idea/
+.vscode/
+*.swp
+
+# generated archives are committed deliberately (see README); ignore strays
+*.log
