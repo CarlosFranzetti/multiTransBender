@@ -24,22 +24,55 @@ export default function PluginPage() {
           <span className="faint mono">VST3 · AU · Standalone</span>
         </div>
         <p className="muted" style={{ fontSize: '0.92rem' }}>
-          The plugin ships as source with a CMake project that fetches JUCE for you. One command
-          produces the VST3, the Audio Unit and the local standalone application. Building it
-          yourself means the binary loading into your session is one you compiled — which for
-          something that sits on your master bus is worth the five minutes.
+          Compiled binaries for macOS, Windows and Linux. Every build is produced by
+          CI from the source in this repository, and each platform runs the
+          compiled-plugin test suite before it is packaged — a red run ships nothing.
         </p>
+
+        <table className="spec" style={{ marginBottom: '1rem' }}>
+          <tbody>
+            <tr>
+              <td>macOS — universal (Apple Silicon + Intel)</td>
+              <td>VST3 · Audio Unit · Standalone</td>
+            </tr>
+            <tr>
+              <td>Windows x64</td>
+              <td>VST3 · Standalone</td>
+            </tr>
+            <tr>
+              <td>Linux x64</td>
+              <td>VST3 · Standalone</td>
+            </tr>
+          </tbody>
+        </table>
+
         <div className="btn-row">
           <a
             className="btn btn-primary"
-            href="https://github.com/CarlosFranzetti/multiTransBender/raw/claude/multitransbender-web-deploy-sue1ue/public/downloads/multiTransBender-plugin-source.zip"
+            href="https://github.com/CarlosFranzetti/multiTransBender/releases/latest"
           >
-            Download plugin source
+            Download compiled plugins
           </a>
-          <a className="btn" href="https://github.com/CarlosFranzetti/multiTransBender">
-            View on GitHub
+          <a
+            className="btn"
+            href="https://github.com/CarlosFranzetti/multiTransBender/actions/workflows/build-plugin.yml"
+          >
+            Latest CI builds
+          </a>
+          <a className="btn btn-ghost" href="https://github.com/CarlosFranzetti/multiTransBender">
+            Source on GitHub
           </a>
         </div>
+
+        <div className="notice notice-warn" style={{ marginTop: '1rem' }}>
+          These builds are not code-signed or notarised, so Gatekeeper and SmartScreen
+          will object on first launch. That is what an unsigned beta looks like, not a
+          sign of a problem — <code>INSTALL.md</code> in the download explains how to
+          clear the quarantine flag. If you would rather not run an unsigned binary on
+          your master bus, which is a reasonable position, the source builds in one
+          command:
+        </div>
+
         <pre
           className="mono"
           style={{
@@ -66,6 +99,7 @@ cmake --build build --config Release --parallel`}
           </div>
           <ul className="feature-list">
             <li>Runs live on any track, at real-time latency, on unlimited instances</li>
+            <li>Six bands, each with its own engine, all host-automatable</li>
             <li>A different device per band — low end on one voicing, top end on another</li>
             <li>Every parameter automatable, including the per-band device choice</li>
             <li>Your DAW&rsquo;s timeline replaces the web version&rsquo;s region editor</li>
@@ -80,7 +114,10 @@ cmake --build build --config Release --parallel`}
           </div>
           <ul className="feature-list">
             <li>Linear-phase crossovers — non-causal, so only possible offline</li>
-            <li>Zero-latency lookahead, by reading the control signal ahead of the audio</li>
+            <li>
+              Deeper transient control: reading the gain curve arbitrarily far ahead costs
+              nothing offline, where a plugin can only look ahead as far as it delays
+            </li>
             <li>True A/B: several devices rendered at once and switched sample-aligned</li>
             <li>Automatic loudness matching across every version you are comparing</li>
             <li>Nothing to install, and nothing kept afterwards</li>
