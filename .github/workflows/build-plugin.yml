@@ -102,6 +102,10 @@ jobs:
     name: Package release bundle
     needs: build
     runs-on: ubuntu-22.04
+    # Publishing a release writes to the repository, which the default token is
+    # not granted unless it is asked for explicitly.
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -127,6 +131,27 @@ jobs:
           name: multiTransBender-plugins
           path: multiTransBender-plugins.zip
           if-no-files-found: error
+
+      # A tag cuts a real versioned release. Pushes to the development branch
+      # refresh a single rolling pre-release instead, so the download button on
+      # the site always resolves to something rather than an empty releases page.
+      - name: Publish rolling beta
+        if: github.ref == 'refs/heads/claude/multitransbender-web-deploy-sue1ue'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest-beta
+          name: Latest beta build
+          prerelease: true
+          files: multiTransBender-plugins.zip
+          body: |
+            Rolling build from the development branch — replaced on every push.
+            For a stable download, use a versioned release.
+
+            - **macOS** universal (Apple Silicon + Intel): VST3, Audio Unit, Standalone
+            - **Windows** x64: VST3, Standalone
+            - **Linux** x64: VST3, Standalone
+
+            Unsigned. See INSTALL.md for how to get past Gatekeeper and SmartScreen.
 
       - name: Publish release
         if: startsWith(github.ref, 'refs/tags/v')
