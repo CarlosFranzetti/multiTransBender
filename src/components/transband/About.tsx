@@ -1,6 +1,6 @@
 'use client';
 
-import { FONT_LABEL, FONT_MONO } from './theme';
+import { FONT_LABEL, FONT_MONO, Theme } from './theme';
 
 /**
  * Splash / About — prd.md §3.4.
@@ -35,7 +35,8 @@ export const CREDITS = [
 export const FOOTNOTE =
   'original "inspired-by" artwork · engines modeled on classic hardware · no valves were harmed';
 
-export function AboutScreen({ onClose }: { onClose: () => void }) {
+export function AboutScreen({ onClose, theme }: { onClose: () => void; theme: Theme }) {
+  const accent = theme.accent;
   const credit = (name: string, role: string, tags: string) => (
     <div
       key={name}
@@ -43,7 +44,7 @@ export function AboutScreen({ onClose }: { onClose: () => void }) {
         padding: '14px 18px',
         borderRadius: 10,
         background: 'rgba(255,255,255,.04)',
-        border: '1px solid rgba(232,201,79,.18)',
+        border: `1px solid ${accent}2e`,
         textAlign: 'left',
       }}
     >
@@ -63,7 +64,7 @@ export function AboutScreen({ onClose }: { onClose: () => void }) {
           fontFamily: FONT_LABEL,
           fontSize: 11,
           letterSpacing: 1,
-          color: '#e8c94f',
+          color: accent,
           marginTop: 3,
           fontWeight: 700,
         }}
@@ -122,10 +123,10 @@ export function AboutScreen({ onClose }: { onClose: () => void }) {
               fontSize: 42,
               letterSpacing: 9,
               color: '#efece2',
-              textShadow: '0 0 40px rgba(232,201,79,.25), 0 3px 6px rgba(0,0,0,.7)',
+              textShadow: `0 0 40px ${accent}40, 0 3px 6px rgba(0,0,0,.7)`,
             }}
           >
-            TRANS<span style={{ color: '#e8c94f' }}>BAND</span>
+            TRANS<span style={{ color: accent }}>BAND</span>
           </div>
           <div
             style={{
@@ -145,8 +146,8 @@ export function AboutScreen({ onClose }: { onClose: () => void }) {
               fontFamily: FONT_MONO,
               fontSize: 9.5,
               letterSpacing: 2,
-              color: '#e8c94f',
-              border: '1px solid rgba(232,201,79,.4)',
+              color: accent,
+              border: `1px solid ${accent}66`,
               borderRadius: 20,
               padding: '4px 14px',
             }}
@@ -159,7 +160,7 @@ export function AboutScreen({ onClose }: { onClose: () => void }) {
           style={{
             height: 1,
             background:
-              'linear-gradient(90deg, transparent, rgba(232,201,79,.35), transparent)',
+              `linear-gradient(90deg, transparent, ${accent}59, transparent)`,
           }}
         />
 
@@ -175,7 +176,7 @@ export function AboutScreen({ onClose }: { onClose: () => void }) {
           {TAGLINE[0]}
           <br />
           by the twisted minds at{' '}
-          <span style={{ color: '#e8c94f', fontWeight: 800 }}>{PRODUCT_NAME}</span>
+          <span style={{ color: accent, fontWeight: 800 }}>{PRODUCT_NAME}</span>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 10 }}>
@@ -195,10 +196,10 @@ export function AboutScreen({ onClose }: { onClose: () => void }) {
             padding: '12px 44px',
             borderRadius: 8,
             cursor: 'pointer',
-            border: '1px solid #e8c94f',
-            background: 'linear-gradient(180deg,#f2d868,#d9b53a)',
-            color: '#14161a',
-            boxShadow: '0 0 30px rgba(232,201,79,.3), inset 0 1px 0 rgba(255,255,255,.5)',
+            border: `1px solid ${accent}`,
+            background: theme.accentGrad,
+            color: theme.accentText,
+            boxShadow: `0 0 30px ${accent}4d, inset 0 1px 0 rgba(255,255,255,.35)`,
           }}
         >
           ENTER THE RACK

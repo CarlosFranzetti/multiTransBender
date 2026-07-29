@@ -32,8 +32,7 @@ export default function PluginPage() {
         <div className="btn-row">
           <a
             className="btn btn-primary"
-            href="/downloads/multiTransBender-plugin-source.zip"
-            download
+            href="https://github.com/CarlosFranzetti/multiTransBender/raw/claude/multitransbender-web-deploy-sue1ue/public/downloads/multiTransBender-plugin-source.zip"
           >
             Download plugin source
           </a>

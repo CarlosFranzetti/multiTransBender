@@ -21,7 +21,7 @@ import { BandChips, BandPanel } from './BandPanel';
 import { DeviceFace, Rack3D, RackEars } from './Hardware';
 import { PrefsBar } from './PrefsBar';
 import { Spectrum } from './Spectrum';
-import { FONT_LABEL, FONT_MONO, THEMES, shade } from './theme';
+import { DEFAULT_THEME, FONT_LABEL, FONT_MONO, THEMES, THEME_ORDER, ThemeId, shade } from './theme';
 
 type View = 'engine' | 'panel' | 'rack3d';
 
@@ -57,7 +57,7 @@ export function TransbandApp() {
   const playerRef = useRef<AbPlayer | null>(null);
 
   const [showAbout, setShowAbout] = useState(true);
-  const [themeId, setThemeId] = useState<'dark' | 'light'>('dark');
+  const [themeId, setThemeId] = useState<ThemeId>(DEFAULT_THEME);
   const [view, setView] = useState<View>('engine');
   const theme = THEMES[themeId];
 
@@ -347,7 +347,7 @@ export function TransbandApp() {
     ...buttonStyle,
     background: theme.accentGrad,
     color: theme.accentText,
-    border: '1px solid #d9b53a',
+    border: `1px solid ${theme.accent}`,
   };
 
   return (
@@ -360,7 +360,7 @@ export function TransbandApp() {
         transition: 'background .25s ease',
       }}
     >
-      {showAbout && <AboutScreen onClose={() => setShowAbout(false)} />}
+      {showAbout && <AboutScreen onClose={() => setShowAbout(false)} theme={theme} />}
 
       <div
         style={{
@@ -391,7 +391,7 @@ export function TransbandApp() {
                 color: theme.header,
               }}
             >
-              TRANS<span style={{ color: '#d9a92f' }}>BAND</span>
+              TRANS<span style={{ color: theme.accent }}>BAND</span>
             </div>
             <div style={{ fontFamily: FONT_MONO, fontSize: 9, color: theme.sub }}>
               multiTransBender · v0.1b
@@ -419,21 +419,30 @@ export function TransbandApp() {
                 </button>
               ))}
             </div>
-            <button
-              onClick={() => setThemeId(themeId === 'dark' ? 'light' : 'dark')}
-              title="Toggle theme"
-              aria-label="Toggle light and dark theme"
+            <select
+              value={themeId}
+              onChange={(event) => setThemeId(event.target.value as ThemeId)}
+              aria-label="Theme"
+              title="Chrome theme — faceplate colours never change"
               style={{
-                ...headerButton(false),
+                fontFamily: FONT_LABEL,
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: 1.6,
+                padding: '9px 11px',
                 borderRadius: 6,
+                cursor: 'pointer',
+                background: theme.stripBg,
+                color: theme.stripText,
                 border: `1px solid ${theme.segBorder}`,
-                padding: '9px 13px',
-                fontSize: 13,
-                lineHeight: 1,
               }}
             >
-              {themeId === 'dark' ? '☀' : '☾'}
-            </button>
+              {THEME_ORDER.map((id) => (
+                <option key={id} value={id}>
+                  {THEMES[id].name.toUpperCase()}
+                </option>
+              ))}
+            </select>
             <button
               onClick={() => setShowAbout(true)}
               style={{
@@ -465,11 +474,11 @@ export function TransbandApp() {
                 if (file) void handleFile(file);
               }}
               style={{
-                border: `1px dashed ${dragging ? '#e8c94f' : theme.segBorder}`,
+                border: `1px dashed ${dragging ? theme.accent : theme.segBorder}`,
                 borderRadius: 8,
                 padding: '26px 16px',
                 textAlign: 'center',
-                background: dragging ? 'rgba(232,201,79,.05)' : 'transparent',
+                background: dragging ? `${theme.accent}0d` : 'transparent',
               }}
             >
               <div
@@ -628,7 +637,7 @@ export function TransbandApp() {
                       style={{
                         height: '100%',
                         width: `${status.progress * 100}%`,
-                        background: '#e8c94f',
+                        background: theme.accent,
                         transition: 'width .15s ease',
                       }}
                     />
@@ -668,7 +677,7 @@ export function TransbandApp() {
                           padding: '6px 11px',
                           background: active ? theme.accentGrad : theme.segBg,
                           color: active ? theme.accentText : theme.segText,
-                          border: `1px solid ${active ? '#d9b53a' : theme.segBorder}`,
+                          border: `1px solid ${active ? theme.accent : theme.segBorder}`,
                           display: 'flex',
                           flexDirection: 'column',
                           alignItems: 'flex-start',
@@ -992,7 +1001,7 @@ export function TransbandApp() {
           }}
         >
           engine: click ON the line → add band (max 6) · click node/region → select · knobs drag
-          vertically, shift for fine, double-click to reset · ☀/☾ toggles theme
+          vertically, shift for fine, double-click to reset · four chrome themes in the header
           <br />
           audio is processed in this tab and never uploaded
         </div>
