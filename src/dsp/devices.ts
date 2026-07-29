@@ -1,5 +1,5 @@
 /**
- * TRANSBAND — the ten saturation engines.
+ * MultiTransBend — the ten saturation engines.
  *
  * Per prd.md §3.2 these are original DSP models *inspired by* the character of
  * well-known hardware, with original names and original panel artwork. No

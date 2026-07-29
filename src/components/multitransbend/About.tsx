@@ -10,13 +10,16 @@ import { FONT_LABEL, FONT_MONO, Theme } from './theme';
  * §3.4 asks for.
  */
 
-export const PRODUCT_NAME = 'TRANSBAND';
-export const PRODUCT_SUBTITLE = 'multiTransBender';
+export const COMPANY_NAME = 'CASE AUDIO';
+export const PRODUCT_NAME = 'MULTITRANSBEND';
+/** Split point for the two-tone wordmark: MULTI + TRANSBEND. */
+export const PRODUCT_NAME_HEAD = 'MULTI';
+export const PRODUCT_NAME_TAIL = 'TRANSBEND';
 export const VERSION_BADGE = 'v0.1b · BETA';
 
 export const TAGLINE = [
   'Dreamed up, designed, and willed into existence',
-  'by the twisted minds at TRANSBAND',
+  'by the twisted minds at CASE AUDIO',
 ];
 
 export const CREDITS = [
@@ -89,7 +92,7 @@ export function AboutScreen({ onClose, theme }: { onClose: () => void; theme: Th
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="About TRANSBAND"
+      aria-label="About MultiTransBend"
       onKeyDown={(event) => {
         if (event.key === 'Escape') onClose();
       }}
@@ -120,13 +123,16 @@ export function AboutScreen({ onClose, theme }: { onClose: () => void; theme: Th
             style={{
               fontFamily: FONT_LABEL,
               fontWeight: 800,
-              fontSize: 42,
-              letterSpacing: 9,
+              // MULTITRANSBEND is considerably longer than a one-word mark, so
+              // the tracking is eased to keep it on one line on a phone.
+              fontSize: 34,
+              letterSpacing: 4,
               color: '#efece2',
               textShadow: `0 0 40px ${accent}40, 0 3px 6px rgba(0,0,0,.7)`,
             }}
           >
-            TRANS<span style={{ color: accent }}>BAND</span>
+            {PRODUCT_NAME_HEAD}
+            <span style={{ color: accent }}>{PRODUCT_NAME_TAIL}</span>
           </div>
           <div
             style={{
@@ -137,7 +143,7 @@ export function AboutScreen({ onClose, theme }: { onClose: () => void; theme: Th
               marginTop: 4,
             }}
           >
-            {PRODUCT_SUBTITLE}
+            by {COMPANY_NAME}
           </div>
           <div
             style={{
@@ -176,7 +182,7 @@ export function AboutScreen({ onClose, theme }: { onClose: () => void; theme: Th
           {TAGLINE[0]}
           <br />
           by the twisted minds at{' '}
-          <span style={{ color: accent, fontWeight: 800 }}>{PRODUCT_NAME}</span>
+          <span style={{ color: accent, fontWeight: 800 }}>{COMPANY_NAME}</span>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 10 }}>

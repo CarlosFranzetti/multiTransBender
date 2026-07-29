@@ -280,7 +280,7 @@ export function DeviceFace({
             opacity: 0.4,
           }}
         >
-          TRANSBAND
+          CASE AUDIO
         </div>
       </div>
 
@@ -492,7 +492,7 @@ export function TopPlate({ device }: { device: DeviceModel }) {
           color: dark ? 'rgba(255,255,255,.35)' : 'rgba(0,0,0,.4)',
         }}
       >
-        TRANSBAND · {device.name} · TB-{device.id.toUpperCase().slice(0, 4)}-0001
+        CASE AUDIO · {device.name} · CA-{device.id.toUpperCase().slice(0, 4)}-0001
       </div>
     </div>
   );

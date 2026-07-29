@@ -76,7 +76,7 @@ float crestDb (const juce::AudioBuffer<float>& buffer)
 }
 
 /** Run the processor over the whole buffer in host-sized blocks. */
-void runBlocks (MultiTransBenderProcessor& proc, juce::AudioBuffer<float>& buffer, int blockSize)
+void runBlocks (MultiTransBendProcessor& proc, juce::AudioBuffer<float>& buffer, int blockSize)
 {
     juce::MidiBuffer midi;
     for (int pos = 0; pos < buffer.getNumSamples(); pos += blockSize)
@@ -88,11 +88,11 @@ void runBlocks (MultiTransBenderProcessor& proc, juce::AudioBuffer<float>& buffe
     }
 }
 
-void setAllBands (MultiTransBenderProcessor& proc, const char* suffix, float value)
+void setAllBands (MultiTransBendProcessor& proc, const char* suffix, float value)
 {
     for (int band = 0; band < mtb::maxBands; ++band)
         if (auto* p = proc.getState().getParameter (
-                MultiTransBenderProcessor::bandParamId (band, suffix)))
+                MultiTransBendProcessor::bandParamId (band, suffix)))
             p->setValueNotifyingHost (p->convertTo0to1 (value));
 }
 } // namespace
@@ -107,7 +107,7 @@ int main()
 
     std::printf ("\nCompiled plugin\n");
 
-    MultiTransBenderProcessor proc;
+    MultiTransBendProcessor proc;
     proc.setPlayConfigDetails (2, 2, sampleRate, blockSize);
     proc.prepareToPlay (sampleRate, blockSize);
 
@@ -185,7 +185,7 @@ int main()
         setAllBands (proc, "drive", 0.7f);
         for (int band = 0; band < mtb::maxBands; ++band)
             if (auto* p = proc.getState().getParameter (
-                    MultiTransBenderProcessor::bandParamId (band, "device")))
+                    MultiTransBendProcessor::bandParamId (band, "device")))
                 p->setValueNotifyingHost (p->convertTo0to1 (static_cast<float> (d)));
 
         juce::AudioBuffer<float> out (2, lengthSamples);
@@ -207,7 +207,7 @@ int main()
     // State round-trip: a preset must survive save and recall.
     juce::MemoryBlock blob;
     proc.getStateInformation (blob);
-    MultiTransBenderProcessor restored;
+    MultiTransBendProcessor restored;
     restored.setStateInformation (blob.getData(), static_cast<int> (blob.getSize()));
     check ("state saves and recalls", blob.getSize() > 0
            && restored.getState().state.isValid());

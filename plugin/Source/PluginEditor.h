@@ -10,7 +10,7 @@
 class BandStrip final : public juce::Component
 {
 public:
-    BandStrip (MultiTransBenderProcessor& owner, int bandIndex);
+    BandStrip (MultiTransBendProcessor& owner, int bandIndex);
 
     void paint (juce::Graphics&) override;
     void resized() override;
@@ -24,7 +24,7 @@ private:
 
     void addRotary (juce::Slider& slider, juce::Label& label, const juce::String& text);
 
-    MultiTransBenderProcessor& proc;
+    MultiTransBendProcessor& proc;
     int index;
 
     juce::ComboBox deviceBox;
@@ -42,12 +42,12 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BandStrip)
 };
 
-class MultiTransBenderEditor final : public juce::AudioProcessorEditor,
+class MultiTransBendEditor final : public juce::AudioProcessorEditor,
                                      private juce::Timer
 {
 public:
-    explicit MultiTransBenderEditor (MultiTransBenderProcessor& owner);
-    ~MultiTransBenderEditor() override = default;
+    explicit MultiTransBendEditor (MultiTransBendProcessor& owner);
+    ~MultiTransBendEditor() override = default;
 
     void paint (juce::Graphics&) override;
     void resized() override;
@@ -56,7 +56,7 @@ private:
     void timerCallback() override;
     void showBackupMenu();
 
-    MultiTransBenderProcessor& proc;
+    MultiTransBendProcessor& proc;
 
     juce::Slider bandCount, xover1, xover2, xover3, inputTrim, outputTrim, mix;
     juce::Label bandCountLabel, xover1Label, xover2Label, xover3Label, inputTrimLabel,
@@ -71,5 +71,5 @@ private:
     std::vector<std::unique_ptr<SliderAttachment>> attachments;
     std::unique_ptr<ButtonAttachment> bypassAttachment;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MultiTransBenderEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MultiTransBendEditor)
 };

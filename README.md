@@ -1,4 +1,4 @@
-# TRANSBAND — multiTransBender
+# MultiTransBend
 
 **v0.1b beta** · A multiband transient designer with per-band analog saturation.
 
@@ -181,7 +181,7 @@ src/workers/        rendering worker (the only place decoded audio lives)
 src/lib/            worker client, gapless A/B playback, auth, database
 src/app/            Next.js routes and API endpoints
 src/components/
-  transband/        the three views, themes, splash, knobs, hardware
+  multitransbend/        the three views, themes, splash, knobs, hardware
 plugin/             JUCE C++ — VST3, AU, CLAP, Standalone
 design/transband/   the specification package this was built from
 tests/dsp.test.ts   the verification suite

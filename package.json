@@ -1,8 +1,8 @@
 {
-  "name": "multitransbender",
+  "name": "multitransbend",
   "version": "0.1.0-beta.1",
   "private": true,
-  "description": "TRANSBAND \u2014 multiTransBender: multiband transient designer with per-band analog saturation.",
+  "description": "CASE AUDIO \u2014 MultiTransBend: multiband transient designer with per-band analog saturation.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

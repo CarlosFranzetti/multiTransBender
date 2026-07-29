@@ -20,7 +20,7 @@ juce::Colour deviceColour (int index)
 
 // ---------------------------------------------------------------------------
 
-BandStrip::BandStrip (MultiTransBenderProcessor& owner, int bandIndex)
+BandStrip::BandStrip (MultiTransBendProcessor& owner, int bandIndex)
     : proc (owner), index (bandIndex)
 {
     auto& state = proc.getState();
@@ -37,12 +37,12 @@ BandStrip::BandStrip (MultiTransBenderProcessor& owner, int bandIndex)
     deviceBox.setColour (juce::ComboBox::outlineColourId, line);
     addAndMakeVisible (deviceBox);
     deviceAttachment = std::make_unique<ComboAttachment> (
-        state, MultiTransBenderProcessor::bandParamId (index, "device"), deviceBox);
+        state, MultiTransBendProcessor::bandParamId (index, "device"), deviceBox);
 
     enabledButton.setColour (juce::ToggleButton::textColourId, dimText);
     addAndMakeVisible (enabledButton);
     enabledAttachment = std::make_unique<ButtonAttachment> (
-        state, MultiTransBenderProcessor::bandParamId (index, "enabled"), enabledButton);
+        state, MultiTransBendProcessor::bandParamId (index, "enabled"), enabledButton);
 
     struct Entry { juce::Slider& slider; juce::Label& label; const char* id; const char* text; };
     const Entry entries[] = {
@@ -59,7 +59,7 @@ BandStrip::BandStrip (MultiTransBenderProcessor& owner, int bandIndex)
     {
         addRotary (entry.slider, entry.label, entry.text);
         attachments.push_back (std::make_unique<SliderAttachment> (
-            state, MultiTransBenderProcessor::bandParamId (index, entry.id), entry.slider));
+            state, MultiTransBendProcessor::bandParamId (index, entry.id), entry.slider));
     }
 }
 
@@ -150,7 +150,7 @@ void BandStrip::resized()
 
 // ---------------------------------------------------------------------------
 
-MultiTransBenderEditor::MultiTransBenderEditor (MultiTransBenderProcessor& owner)
+MultiTransBendEditor::MultiTransBendEditor (MultiTransBendProcessor& owner)
     : AudioProcessorEditor (&owner), proc (owner)
 {
     auto& state = proc.getState();
@@ -211,7 +211,7 @@ MultiTransBenderEditor::MultiTransBenderEditor (MultiTransBenderProcessor& owner
     startTimerHz (24);
 }
 
-void MultiTransBenderEditor::showBackupMenu()
+void MultiTransBendEditor::showBackupMenu()
 {
     auto& store = proc.getStore();
     const auto backups = store.listBackups();
@@ -240,19 +240,19 @@ void MultiTransBenderEditor::showBackupMenu()
                         });
 }
 
-void MultiTransBenderEditor::timerCallback()
+void MultiTransBendEditor::timerCallback()
 {
     for (int i = 0; i < static_cast<int> (strips.size()); ++i)
         strips[static_cast<size_t> (i)]->setGainDb (proc.getBandGainDb (i));
 }
 
-void MultiTransBenderEditor::paint (juce::Graphics& g)
+void MultiTransBendEditor::paint (juce::Graphics& g)
 {
     g.fillAll (background);
 
     g.setColour (textColour);
     g.setFont (juce::FontOptions (19.0f).withStyle ("Bold"));
-    g.drawText ("multiTransBender", 18, 14, 300, 24, juce::Justification::centredLeft);
+    g.drawText ("MultiTransBend", 18, 14, 300, 24, juce::Justification::centredLeft);
 
     g.setColour (dimText);
     g.setFont (juce::FontOptions (11.0f));
@@ -261,7 +261,7 @@ void MultiTransBenderEditor::paint (juce::Graphics& g)
                 18, 38, 620, 16, juce::Justification::centredLeft);
 }
 
-void MultiTransBenderEditor::resized()
+void MultiTransBendEditor::resized()
 {
     auto bounds = getLocalBounds().reduced (14);
     bounds.removeFromTop (46);

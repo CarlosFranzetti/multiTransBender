@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.22)
 # so those languages have to be enabled here even though none of our code uses
 # them. Declaring CXX alone fails at generate time with a missing
 # CMAKE_C_COMPILE_OBJECT.
-project(multiTransBender VERSION 0.1.0 LANGUAGES C CXX)
+project(MultiTransBend VERSION 0.1.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -21,13 +21,16 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(JUCE)
 
-juce_add_plugin(multiTransBender
-    COMPANY_NAME              "multiTransBender"
-    BUNDLE_ID                 "com.multitransbender.plugin"
-    PLUGIN_MANUFACTURER_CODE  MtbA
+juce_add_plugin(MultiTransBend
+    COMPANY_NAME              "Case Audio"
+    BUNDLE_ID                 "com.caseaudio.multitransbend"
+    # Four-character codes are the plugin's identity to a host. Changing them
+    # makes existing sessions fail to find the plugin, so they are being set
+    # now, while the only builds in the world are beta ones, and not after.
+    PLUGIN_MANUFACTURER_CODE  CsAu
     PLUGIN_CODE               Mtbd
     FORMATS                   VST3 AU Standalone
-    PRODUCT_NAME              "multiTransBender"
+    PRODUCT_NAME              "MultiTransBend"
     IS_SYNTH                  FALSE
     NEEDS_MIDI_INPUT          FALSE
     NEEDS_MIDI_OUTPUT         FALSE
@@ -38,13 +41,13 @@ juce_add_plugin(multiTransBender
     AU_MAIN_TYPE              kAudioUnitType_Effect
 )
 
-target_sources(multiTransBender PRIVATE
+target_sources(MultiTransBend PRIVATE
     Source/PluginProcessor.cpp
     Source/PluginEditor.cpp
     Source/ProjectStore.cpp
 )
 
-target_compile_definitions(multiTransBender PUBLIC
+target_compile_definitions(MultiTransBend PUBLIC
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
     JUCE_VST3_CAN_REPLACE_VST2=0
@@ -55,9 +58,9 @@ target_compile_definitions(multiTransBender PUBLIC
     JUCE_DONT_DECLARE_PROJECTINFO=0
 )
 
-target_include_directories(multiTransBender PRIVATE Source)
+target_include_directories(MultiTransBend PRIVATE Source)
 
-target_link_libraries(multiTransBender PRIVATE
+target_link_libraries(MultiTransBend PRIVATE
     juce::juce_audio_utils
     juce::juce_dsp
     PUBLIC
@@ -70,18 +73,18 @@ target_link_libraries(multiTransBender PRIVATE
 # Console smoke test for the compiled plugin. Links the shared code and drives
 # the real AudioProcessor, so it verifies the binary that actually ships rather
 # than a reimplementation of it.
-juce_add_console_app(multiTransBenderTests PRODUCT_NAME "multiTransBenderTests")
+juce_add_console_app(MultiTransBendTests PRODUCT_NAME "MultiTransBendTests")
 
-target_sources(multiTransBenderTests PRIVATE tests/EngineSmokeTest.cpp)
-target_include_directories(multiTransBenderTests PRIVATE Source)
-target_compile_definitions(multiTransBenderTests PRIVATE
+target_sources(MultiTransBendTests PRIVATE tests/EngineSmokeTest.cpp)
+target_include_directories(MultiTransBendTests PRIVATE Source)
+target_compile_definitions(MultiTransBendTests PRIVATE
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
     JUCE_STANDALONE_APPLICATION=1
     JUCE_DISPLAY_SPLASH_SCREEN=0
 )
-target_link_libraries(multiTransBenderTests PRIVATE
-    multiTransBender
+target_link_libraries(MultiTransBendTests PRIVATE
+    MultiTransBend
     juce::juce_audio_utils
     juce::juce_dsp
 )

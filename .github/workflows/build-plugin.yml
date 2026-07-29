@@ -72,7 +72,7 @@ jobs:
         # The test drives the real AudioProcessor, so a green run means the
         # binary being packaged actually processes audio correctly.
         run: |
-          BIN=$(find build -name "multiTransBenderTests*" -type f -perm -u+x | head -1)
+          BIN=$(find build -name "MultiTransBendTests*" -type f -perm -u+x | head -1)
           if [ -z "$BIN" ]; then echo "test binary not found"; exit 1; fi
           if [ "${{ runner.os }}" = "Linux" ]; then xvfb-run -a "$BIN"; else "$BIN"; fi
 
@@ -83,8 +83,8 @@ jobs:
         # those into the plugin download.
         run: |
           rm -rf staged && mkdir -p staged
-          SRC="plugin/build/multiTransBender_artefacts/Release"
-          [ -d "$SRC" ] || SRC="plugin/build/multiTransBender_artefacts"
+          SRC="plugin/build/MultiTransBend_artefacts/Release"
+          [ -d "$SRC" ] || SRC="plugin/build/MultiTransBend_artefacts"
           for fmt in VST3 AU Standalone; do
             if [ -d "$SRC/$fmt" ]; then
               mkdir -p "staged/$fmt"
@@ -97,7 +97,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: multiTransBender-${{ matrix.artifact }}
+          name: MultiTransBend-${{ matrix.artifact }}
           path: staged
           if-no-files-found: error
 
@@ -120,32 +120,32 @@ jobs:
         run: |
           mkdir -p bundle
           for d in staging/*/; do
-            platform=$(basename "$d" | sed 's/multiTransBender-//')
+            platform=$(basename "$d" | sed 's/MultiTransBend-//')
             mkdir -p "bundle/$platform"
             cp -R "$d." "bundle/$platform/"
           done
           cp docs/INSTALL.md bundle/ 2>/dev/null || true
           cp LICENSE bundle/
-          cd bundle && zip -r -9 ../multiTransBender-plugins.zip . && cd ..
-          ls -la multiTransBender-plugins.zip
+          cd bundle && zip -r -9 ../MultiTransBend-plugins.zip . && cd ..
+          ls -la MultiTransBend-plugins.zip
 
       - uses: actions/upload-artifact@v4
         with:
-          name: multiTransBender-plugins
-          path: multiTransBender-plugins.zip
+          name: MultiTransBend-plugins
+          path: MultiTransBend-plugins.zip
           if-no-files-found: error
 
       # A tag cuts a real versioned release. Pushes to the development branch
       # refresh a single rolling pre-release instead, so the download button on
       # the site always resolves to something rather than an empty releases page.
       - name: Publish rolling beta
-        if: github.ref == 'refs/heads/claude/multitransbender-web-deploy-sue1ue'
+        if: github.ref == 'refs/heads/claude/multitransbend-web-deploy-sue1ue'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: latest-beta
           name: Latest beta build
           prerelease: true
-          files: multiTransBender-plugins.zip
+          files: MultiTransBend-plugins.zip
           body: |
             Rolling build from the development branch — replaced on every push.
             For a stable download, use a versioned release.
@@ -160,9 +160,9 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: multiTransBender-plugins.zip
+          files: MultiTransBend-plugins.zip
           body: |
-            Compiled TRANSBAND — multiTransBender plugins.
+            Compiled MultiTransBend plugins.
 
             - **macOS** universal (Apple Silicon + Intel): VST3, Audio Unit, Standalone
             - **Windows** x64: VST3, Standalone

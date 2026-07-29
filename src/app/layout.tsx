@@ -3,10 +3,10 @@ import './globals.css';
 import { AppHeader } from '@/components/AppHeader';
 
 export const metadata: Metadata = {
-  title: 'TRANSBAND — multiTransBender',
+  title: 'MultiTransBend',
   description:
     'A multiband transient designer with per-band analog saturation. Six bands, ten engines, three views. Process in the browser at full resolution and download a lossless file. Nothing is uploaded.',
-  applicationName: 'TRANSBAND — multiTransBender',
+  applicationName: 'MultiTransBend',
 };
 
 export const viewport: Viewport = {
@@ -33,7 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               color: 'var(--text-faint)',
             }}
           >
-            <span>TRANSBAND · multiTransBender v0.1b — audio never leaves your browser.</span>
+            <span>CASE AUDIO · MultiTransBend v0.1b — audio never leaves your browser.</span>
             <span className="mono">64-bit engine · 6 bands · 10 engines · lossless export</span>
           </div>
         </footer>

@@ -1,6 +1,6 @@
 # STATE — design decisions, open questions, and what comes next
 
-Working memory for TRANSBAND — multiTransBender. Records *why* things are the
+Working memory for MultiTransBend. Records *why* things are the
 way they are, so the reasoning survives even when the code changes.
 
 ---
@@ -94,7 +94,7 @@ required measuring peak and RMS separately rather than trusting the ratio.
    builds VST3/AU/Standalone only; CLAP needs `clap-juce-extensions`.
 6. **Undo/redo** (prd.md §6) is not implemented.
 7. **Preset save/load to the account** has API routes and a schema but no UI
-   binding in the new TRANSBAND shell.
+   binding in the new CASE AUDIO shell.
 
 ---
 

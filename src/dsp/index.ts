@@ -1,5 +1,5 @@
 /**
- * multiTransBender DSP core.
+ * MultiTransBend DSP core.
  *
  * Pure TypeScript, no Web Audio, no DOM. It runs unchanged in a Web Worker, in
  * Node for the test suite, and in the local standalone build, which means the

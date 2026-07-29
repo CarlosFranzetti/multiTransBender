@@ -1,4 +1,4 @@
-# Installing TRANSBAND — multiTransBender
+# Installing MultiTransBend
 
 The download contains one folder per platform. Take the one for your machine.
 
@@ -21,8 +21,8 @@ first launch. That is expected for an unsigned beta, not a sign of a problem.
 Clear the quarantine flag:
 
 ```bash
-xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/multiTransBender.vst3
-xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/Components/multiTransBender.component
+xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/MultiTransBend.vst3
+xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/Components/MultiTransBend.component
 ```
 
 Logic and GarageBand cache their plugin scan, so if the Audio Unit does not

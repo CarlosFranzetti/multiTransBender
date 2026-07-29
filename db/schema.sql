@@ -1,4 +1,4 @@
--- multiTransBender — Neon/Postgres schema.
+-- MultiTransBend — Neon/Postgres schema.
 --
 -- PRIVACY CONTRACT, enforced by the shape of this schema:
 -- there is no audio column anywhere, and there never will be. The web

@@ -1,7 +1,7 @@
 import { AccountClient } from '@/components/AccountClient';
 
 export const metadata = {
-  title: 'Account — multiTransBender',
+  title: 'Account — MultiTransBend',
   description: 'Optional accounts for syncing presets. Settings only, never audio.',
 };
 

@@ -3,12 +3,12 @@
  *
  * Produces two archives:
  *
- *   public/downloads/multiTransBender-plugin-source.zip
+ *   public/downloads/MultiTransBend-plugin-source.zip
  *       The plugin and local standalone, ready to build with CMake. This is
  *       what the deployed site serves from /plugin, so it has to live under
  *       public/ to be part of the deployment.
  *
- *   dist/multiTransBender-<version>-source.zip
+ *   dist/MultiTransBend-<version>-source.zip
  *       The whole project. Committed to the repository as a single-file
  *       snapshot alongside the unpacked tree.
  *
@@ -54,10 +54,10 @@ function sizeOf(path: string): string {
   return `${(size / 1024).toFixed(0)} KB`;
 }
 
-const pluginArchive = 'public/downloads/multiTransBender-plugin-source.zip';
+const pluginArchive = 'public/downloads/MultiTransBend-plugin-source.zip';
 zip(pluginArchive, ['plugin', 'docs/BUILDING.md', 'LICENSE', 'src/dsp', 'design']);
 console.log(`plugin bundle  ${pluginArchive}  ${sizeOf(join(root, pluginArchive))}`);
 
-const sourceArchive = `dist/multiTransBender-${pkg.version}-source.zip`;
+const sourceArchive = `dist/MultiTransBend-${pkg.version}-source.zip`;
 zip(sourceArchive, ['.'], EXCLUDES);
 console.log(`source bundle  ${sourceArchive}  ${sizeOf(join(root, sourceArchive))}`);

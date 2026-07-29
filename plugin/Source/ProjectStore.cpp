@@ -11,7 +11,7 @@ juce::String timestamp()
 ProjectStore::ProjectStore()
 {
     root = juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory)
-               .getChildFile ("multiTransBender");
+               .getChildFile ("MultiTransBend");
 
     getBackupDirectory().createDirectory();
     getExportDirectory().createDirectory();

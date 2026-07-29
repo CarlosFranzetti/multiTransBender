@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'Privacy — multiTransBender',
+  title: 'Privacy — MultiTransBend',
   description: 'What the web standalone stores, what it does not, and why.',
 };
 

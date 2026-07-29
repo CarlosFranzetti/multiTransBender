@@ -52,7 +52,7 @@ function formatDb(value: number, digits = 1): string {
  */
 const FACE_BINDINGS = ['drive', 'character', 'satMix', 'detail', 'output'] as const;
 
-export function TransbandApp() {
+export function MultiTransBendApp() {
   const engineRef = useRef<EngineClient | null>(null);
   const playerRef = useRef<AbPlayer | null>(null);
 
@@ -248,7 +248,7 @@ export function TransbandApp() {
       const base = loaded.fileName.replace(/\.[^.]+$/, '');
       const depth = exportOptions.float ? '32f' : `${exportOptions.bitDepth}`;
       anchor.href = url;
-      anchor.download = `${base} — TRANSBAND ${result.label} [${depth}].wav`;
+      anchor.download = `${base} — CASE AUDIO ${result.label} [${depth}].wav`;
       anchor.click();
       setTimeout(() => URL.revokeObjectURL(url), 30000);
     } catch (cause) {
@@ -391,10 +391,10 @@ export function TransbandApp() {
                 color: theme.header,
               }}
             >
-              TRANS<span style={{ color: theme.accent }}>BAND</span>
+              MULTI<span style={{ color: theme.accent }}>TRANSBEND</span>
             </div>
             <div style={{ fontFamily: FONT_MONO, fontSize: 9, color: theme.sub }}>
-              multiTransBender · v0.1b
+              Case Audio · v0.1b
             </div>
           </div>
 

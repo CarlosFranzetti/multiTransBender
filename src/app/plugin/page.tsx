@@ -1,7 +1,7 @@
 import { DEVICES } from '@/dsp';
 
 export const metadata = {
-  title: 'Plugin — multiTransBender',
+  title: 'Plugin — MultiTransBend',
   description:
     'The VST3, Audio Unit and local standalone build. Real-time, automatable, and it keeps your exports and backups.',
 };
@@ -49,23 +49,23 @@ export default function PluginPage() {
         <div className="btn-row">
           <a
             className="btn btn-primary"
-            href="https://github.com/CarlosFranzetti/multiTransBender/releases/download/latest-beta/multiTransBender-plugins.zip"
+            href="https://github.com/CarlosFranzetti/MultiTransBend/releases/download/latest-beta/MultiTransBend-plugins.zip"
           >
             Download compiled plugins
           </a>
           <a
             className="btn"
-            href="https://github.com/CarlosFranzetti/multiTransBender/releases"
+            href="https://github.com/CarlosFranzetti/MultiTransBend/releases"
           >
             All releases
           </a>
           <a
             className="btn"
-            href="https://github.com/CarlosFranzetti/multiTransBender/actions/workflows/build-plugin.yml"
+            href="https://github.com/CarlosFranzetti/MultiTransBend/actions/workflows/build-plugin.yml"
           >
             Latest CI builds
           </a>
-          <a className="btn btn-ghost" href="https://github.com/CarlosFranzetti/multiTransBender">
+          <a className="btn btn-ghost" href="https://github.com/CarlosFranzetti/MultiTransBend">
             Source on GitHub
           </a>
         </div>
@@ -159,15 +159,15 @@ cmake --build build --config Release --parallel`}
           <tbody>
             <tr>
               <td>macOS</td>
-              <td>~/Library/Application Support/multiTransBender/</td>
+              <td>~/Library/Application Support/MultiTransBend/</td>
             </tr>
             <tr>
               <td>Windows</td>
-              <td>%APPDATA%\multiTransBender\</td>
+              <td>%APPDATA%\MultiTransBend\</td>
             </tr>
             <tr>
               <td>Linux</td>
-              <td>~/.config/multiTransBender/</td>
+              <td>~/.config/MultiTransBend/</td>
             </tr>
           </tbody>
         </table>

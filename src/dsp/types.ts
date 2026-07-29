@@ -1,5 +1,5 @@
 /**
- * TRANSBAND — multiTransBender · core types.
+ * MultiTransBend · core types.
  *
  * Follows the parameter surface defined in design/transband/prd.md §3.1:
  * 1–6 bands, each a fully independent chain with its own transient shaping AND

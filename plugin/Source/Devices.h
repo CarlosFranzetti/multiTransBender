@@ -4,7 +4,7 @@
 #include <string_view>
 
 /**
- * The ten TRANSBAND saturation engines.
+ * MultiTransBend — the ten saturation engines.
  *
  * Numerically identical to src/dsp/devices.ts. That table is the contract
  * between the offline renderer and this real-time engine: a chain dialled in the

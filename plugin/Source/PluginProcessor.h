@@ -9,7 +9,7 @@
 #include "TransientEngine.h"
 
 /**
- * multiTransBender — plugin processor.
+ * MultiTransBend — plugin processor.
  *
  * The plugin's answer to "multi-device" is per-band device assignment: each
  * transient band runs its own device, so the low end can be shaped by one
@@ -18,11 +18,11 @@
  * different *point* in the file — is the host's job here: automate the band's
  * device parameter and the same thing happens on the timeline.
  */
-class MultiTransBenderProcessor final : public juce::AudioProcessor
+class MultiTransBendProcessor final : public juce::AudioProcessor
 {
 public:
-    MultiTransBenderProcessor();
-    ~MultiTransBenderProcessor() override = default;
+    MultiTransBendProcessor();
+    ~MultiTransBendProcessor() override = default;
 
     void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override;
     void releaseResources() override;
@@ -35,7 +35,7 @@ public:
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override { return true; }
 
-    const juce::String getName() const override { return "multiTransBender"; }
+    const juce::String getName() const override { return "MultiTransBend"; }
     bool acceptsMidi() const override { return false; }
     bool producesMidi() const override { return false; }
     bool isMidiEffect() const override { return false; }
@@ -89,5 +89,5 @@ private:
 
     ProjectStore store;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MultiTransBenderProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MultiTransBendProcessor)
 };

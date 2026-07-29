@@ -1,4 +1,4 @@
-# Building multiTransBender
+# Building MultiTransBend
 
 Two independent builds live in this repository: the web/standalone TypeScript
 engine and the C++ plugin. They share an algorithm, not a compiler.
@@ -37,11 +37,11 @@ cmake --build build --config Release --parallel
 The first configure clones JUCE and takes a few minutes. Subsequent builds do
 not.
 
-Artifacts land in `plugin/build/multiTransBender_artefacts/Release/`:
+Artifacts land in `plugin/build/MultiTransBend_artefacts/Release/`:
 
-- `VST3/multiTransBender.vst3`
-- `AU/multiTransBender.component` (macOS only)
-- `Standalone/multiTransBender` — the local standalone application
+- `VST3/MultiTransBend.vst3`
+- `AU/MultiTransBend.component` (macOS only)
+- `Standalone/MultiTransBend` — the local standalone application
 
 `COPY_PLUGIN_AFTER_BUILD` is on, so on macOS and Windows the plugin is also
 installed to the system plugin folder as part of the build.
@@ -50,9 +50,9 @@ installed to the system plugin folder as part of the build.
 
 | Platform | Path |
 | --- | --- |
-| macOS | `~/Library/Application Support/multiTransBender/` |
-| Windows | `%APPDATA%\multiTransBender\` |
-| Linux | `~/.config/multiTransBender/` |
+| macOS | `~/Library/Application Support/MultiTransBend/` |
+| Windows | `%APPDATA%\MultiTransBend\` |
+| Linux | `~/.config/MultiTransBend/` |
 
 Inside that folder, `backups/` holds the last three processing states and
 `exports/` holds a dated copy of every render together with the settings that
@@ -93,6 +93,6 @@ checked in so it can be reviewed before anything runs.
 npm run package:zip
 ```
 
-Writes `public/downloads/multiTransBender-plugin-source.zip` (served by the
-deployed site) and `dist/multiTransBender-<version>-source.zip` (a snapshot of
+Writes `public/downloads/MultiTransBend-plugin-source.zip` (served by the
+deployed site) and `dist/MultiTransBend-<version>-source.zip` (a snapshot of
 the whole project).

@@ -19,9 +19,9 @@ export function AppHeader() {
       <div className="header-inner">
         <Link href="/" className="brand">
           <span>
-            TRANS<span className="brand-mark">BAND</span>
+            Multi<span className="brand-mark">TransBend</span>
           </span>
-          <span className="brand-version">multiTransBender · v{ENGINE_VERSION}</span>
+          <span className="brand-version">Case Audio · v{ENGINE_VERSION}</span>
         </Link>
         <nav className="nav">
           {LINKS.map((link) => (

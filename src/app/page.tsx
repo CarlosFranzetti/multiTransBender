@@ -9,7 +9,7 @@ export default function HomePage() {
           Six bands. Ten engines. Every band gets its own.
         </h1>
         <p>
-          TRANSBAND — multiTransBender is a multiband transient designer with per-band analog
+          MultiTransBend is a multiband transient designer with per-band analog
           saturation. Split the spectrum up to six ways, then give every band its own attack,
           sustain and detail shaping <em>and</em> its own saturation engine. Process at full
           resolution in your browser and download a lossless file.

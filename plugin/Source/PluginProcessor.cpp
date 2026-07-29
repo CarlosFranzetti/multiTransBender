@@ -9,23 +9,23 @@ const char* const bandSuffixes[] = { "attack", "sustain", "attackTime", "release
                                      "sustainTime", "drive", "trim", "device", "enabled" };
 } // namespace
 
-juce::String MultiTransBenderProcessor::bandParamId (int band, const char* suffix)
+juce::String MultiTransBendProcessor::bandParamId (int band, const char* suffix)
 {
     return juce::String ("band") + juce::String (band + 1) + "_" + suffix;
 }
 
-MultiTransBenderProcessor::MultiTransBenderProcessor()
+MultiTransBendProcessor::MultiTransBendProcessor()
     : AudioProcessor (BusesProperties()
                           .withInput ("Input", juce::AudioChannelSet::stereo(), true)
                           .withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
-      parameters (*this, nullptr, "multiTransBender", createLayout())
+      parameters (*this, nullptr, "MultiTransBend", createLayout())
 {
     juce::ignoreUnused (bandSuffixes);
     for (auto& value : bandGainDb)
         value.store (0.0f);
 }
 
-juce::AudioProcessorValueTreeState::ParameterLayout MultiTransBenderProcessor::createLayout()
+juce::AudioProcessorValueTreeState::ParameterLayout MultiTransBendProcessor::createLayout()
 {
     using namespace juce;
     AudioProcessorValueTreeState::ParameterLayout layout;
@@ -121,7 +121,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout MultiTransBenderProcessor::c
     return layout;
 }
 
-void MultiTransBenderProcessor::prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock)
+void MultiTransBendProcessor::prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock)
 {
     currentSampleRate = sampleRate;
 
@@ -160,7 +160,7 @@ void MultiTransBenderProcessor::prepareToPlay (double sampleRate, int maximumExp
     updateLatency();
 }
 
-void MultiTransBenderProcessor::releaseResources()
+void MultiTransBendProcessor::releaseResources()
 {
     splitter.reset();
     for (auto& state : bandStates)
@@ -169,7 +169,7 @@ void MultiTransBenderProcessor::releaseResources()
     dryDelay.reset();
 }
 
-bool MultiTransBenderProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool MultiTransBendProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
     const auto& out = layouts.getMainOutputChannelSet();
     if (out != juce::AudioChannelSet::mono() && out != juce::AudioChannelSet::stereo())
@@ -177,7 +177,7 @@ bool MultiTransBenderProcessor::isBusesLayoutSupported (const BusesLayout& layou
     return layouts.getMainInputChannelSet() == out;
 }
 
-void MultiTransBenderProcessor::updateLatency()
+void MultiTransBendProcessor::updateLatency()
 {
     // One delay line is shared by every band, so they stay time-aligned with
     // each other and the host compensates once.
@@ -212,7 +212,7 @@ void MultiTransBenderProcessor::updateLatency()
     }
 }
 
-void MultiTransBenderProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
+void MultiTransBendProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
 {
     juce::ScopedNoDenormals noDenormals;
 
@@ -351,12 +351,12 @@ void MultiTransBenderProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
     }
 }
 
-juce::AudioProcessorEditor* MultiTransBenderProcessor::createEditor()
+juce::AudioProcessorEditor* MultiTransBendProcessor::createEditor()
 {
-    return new MultiTransBenderEditor (*this);
+    return new MultiTransBendEditor (*this);
 }
 
-void MultiTransBenderProcessor::getStateInformation (juce::MemoryBlock& destData)
+void MultiTransBendProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     if (auto state = parameters.copyState(); state.isValid())
     {
@@ -369,7 +369,7 @@ void MultiTransBenderProcessor::getStateInformation (juce::MemoryBlock& destData
     }
 }
 
-void MultiTransBenderProcessor::setStateInformation (const void* data, int sizeInBytes)
+void MultiTransBendProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     if (auto xml = getXmlFromBinary (data, sizeInBytes))
     {
@@ -381,5 +381,5 @@ void MultiTransBenderProcessor::setStateInformation (const void* data, int sizeI
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new MultiTransBenderProcessor();
+    return new MultiTransBendProcessor();
 }
