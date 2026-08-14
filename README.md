@@ -1,4 +1,8 @@
-# multiTransBend
+# MultiTransBend
+
+> **Project relationship:** This repository contains the public web interface and product
+> demo. Native JUCE plugin engineering continues in the private
+> [RackForge](https://github.com/CarlosFranzetti/RackForge) repository.
 
 ### *Multiband transient designer with per-band analog-flavored saturation.*
 
